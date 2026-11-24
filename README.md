@@ -2,7 +2,7 @@
 
 Solutions for [Full Stack Open, part 14: Next.js](https://courses.mooc.fi/org/uh-cs/courses/full-stack-open-nextjs).
 
-Parts 0–5: [fullstack-open-part00-05](https://github.com/Kopfdreher/fullstack-open-part00-05). Part 11: [fullstack-open-part11](https://github.com/Kopfdreher/fullstack-open-part11).
+Parts 0–5: [fullstack-open-part00-05](https://github.com/Kopfdreher/fullstack-open-part00-05).
 
 Unlike earlier parts built as a Single-Page Application with a separate Node/Express backend, this part builds full-stack applications with **Next.js** and **React Server Components (RSC)**.
 
