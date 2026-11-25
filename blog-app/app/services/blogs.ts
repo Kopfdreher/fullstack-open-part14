@@ -1,49 +1,27 @@
-const blogs = [
-  {
-    "id": 1,
-    "title": "Getting Started with Next.js App Router",
-    "author": "Sarah Jenkins",
-    "url": "https://example.com/blogs/nextjs-app-router",
-    "likes": 42
-  },
-  {
-    "id": 2,
-    "title": "Understanding React Server Components",
-    "author": "David Chen",
-    "url": "https://example.com/blogs/react-server-components",
-    "likes": 85
-  },
-  {
-    "id": 3,
-    "title": "CSS Grid vs. Flexbox: When to Use Which",
-    "author": "Elena Rodriguez",
-    "url": "https://example.com/blogs/css-grid-vs-flexbox",
-    "likes": 64
-  },
-  {
-    "id": 4,
-    "title": "Mastering TypeScript Generics",
-    "author": "Marcus Vance",
-    "url": "https://example.com/blogs/typescript-generics",
-    "likes": 119
-  }
-]
-
-let nextId = 5
+import { eq } from "drizzle-orm"
+import { db } from "../../db"
+import { blogs } from "../../db/schema"
 
 export const getBlogs = () => {
-  return blogs
+  return db.query.blogs.findMany()
 }
 
-export const addBlog = (title: string, author: string, url: string) => {
-  blogs.push({ id: nextId++, title, author, url, likes: 0 })
+export const addBlog = async (title: string, author: string, url: string) => {
+  await db.insert(blogs).values({ title, author, url })
 }
 
-export const getBlogById = (id: number) => {
-  return blogs.find(b => b.id === id)
+export const getBlogById = async (id: number) => {
+  return db.query.blogs.findFirst({
+    where: eq(blogs.id, id),
+  })
 }
 
-export const addLike = (id: number) => {
-  const blog = blogs.find(b => b.id === id)
-  if (blog) blog.likes++
+export const addLike = async (id: number) => {
+  const blog = await getBlogById(id)
+  if (blog) {
+    await db
+      .update(blogs)
+      .set({ likes: blog.likes + 1 })
+      .where(eq(blogs.id, id))
+  }
 }

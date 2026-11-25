@@ -1,0 +1,27 @@
+{
+  "version": "7",
+  "dialect": "postgresql",
+  "entries": [
+    {
+      "idx": 0,
+      "version": "7",
+      "when": 1795613050134,
+      "tag": "0000_cynical_human_fly",
+      "breakpoints": true
+    },
+    {
+      "idx": 1,
+      "version": "7",
+      "when": 1795613411147,
+      "tag": "0001_light_sunfire",
+      "breakpoints": true
+    },
+    {
+      "idx": 2,
+      "version": "7",
+      "when": 1795613861968,
+      "tag": "0002_ancient_dorian_gray",
+      "breakpoints": true
+    }
+  ]
+}
