@@ -21,10 +21,10 @@ const Notes = async ({
       </div>
       <ul>
         {notes.map(n => (
-        <li key={n.id}>
+          <li key={n.id}>
             <Link href={`/notes/${n.id}`}>{n.content}</Link>
             {n.important && <strong> (important)</strong>}
-        </li>
+          </li>
         ))}
       </ul>
     </div>

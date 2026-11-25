@@ -10,7 +10,6 @@ const UserPage = async ({ params }: { params: Promise<{ id: string }> }) => {
 
   if (!user) notFound()
 
-
   return (
     <div>
       <h2>{user.name}</h2>
