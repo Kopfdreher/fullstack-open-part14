@@ -43,6 +43,13 @@
       "when": 1795689666916,
       "tag": "0005_bumpy_groot",
       "breakpoints": true
+    },
+    {
+      "idx": 6,
+      "version": "7",
+      "when": 1795702338269,
+      "tag": "0006_common_otto_octavius",
+      "breakpoints": true
     }
   ]
 }
