@@ -5,8 +5,21 @@ import { getCurrentUser } from "../../services/session"
 import { addBlogLike, addToReadingList } from "../../actions/blogs"
 import { db } from "@/db"
 import { readingList } from "@/db/schema"
+import type { Metadata } from "next"
 
 export const instant = false
+
+export const generateMetadata = async ({
+  params,
+}: {
+  params: Promise<{ id: string }>
+}): Promise<Metadata> => {
+  const { id } = await params
+  const blog = await getBlogById(Number(id))
+  return {
+    title: blog ? blog.title : "Blog not found",
+  }
+}
 
 const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
   const { id } = await params
