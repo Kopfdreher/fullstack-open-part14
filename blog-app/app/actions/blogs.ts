@@ -28,7 +28,7 @@ export const createBlog = async (
   const url = formData.get("url") as string ?? ""
   const values = { title, author, url }
 
-  const errors: Partial<input> = { title: "", author: "", url: "" }
+  const errors: Partial<input> = {}
   const errorString = "must be at least 5 characters"
   if (!title || title.length < 5) errors.title = "title " + errorString
   if (!author || author.length < 5) errors.author = "author " + errorString
