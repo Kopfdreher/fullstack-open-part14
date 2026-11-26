@@ -13,6 +13,12 @@ const eslintConfig = defineConfig([
     "build/**",
     "next-env.d.ts",
   ]),
+  // Enforce consistent 2-space indentation.
+  {
+    rules: {
+      indent: ['error', 2],
+    },
+  },
 ]);
 
 export default eslintConfig;
