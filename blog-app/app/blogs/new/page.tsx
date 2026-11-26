@@ -1,10 +1,11 @@
 "use client"
 
 import { useActionState } from "react"
-import { createBlog } from "../../actions/blogs"
+import { createBlog, type CreateBlogState } from "../../actions/blogs"
 
 const NewBlog = () => {
-  const [state, formAction] = useActionState(createBlog, { error: "" })
+  const initialState: CreateBlogState = {}
+  const [state, formAction] = useActionState(createBlog, initialState)
 
   return (
     <div>
@@ -13,23 +14,37 @@ const NewBlog = () => {
         <div>
           <label>
             Title
-            <input type="text" name="title" required />
+            <input
+              type="text"
+              name="title"
+              defaultValue={state.values?.title}
+              required />
+            {state.errors?.title && <p style={{ color: "red" }}>{state.errors.title}</p>}
           </label>
         </div>
         <div>
           <label>
             Author
-            <input type="text" name="author" required />
+            <input
+              type="text"
+              name="author"
+              defaultValue={state.values?.author}
+              required />
+            {state.errors?.author && <p style={{ color: "red" }}>{state.errors.author}</p>}
           </label>
         </div>
         <div>
           <label>
             URL
-            <input type="text" name="url" required />
+            <input
+              type="text"
+              name="url"
+              defaultValue={state.values?.url}
+              required />
+            {state.errors?.url && <p style={{ color: "red" }}>{state.errors.url}</p>}
           </label>
         </div>
         <button type="submit">Create</button>
-        {state.error && <p style={{ color: "red" }}>{state.error}</p>}
       </form>
     </div>
   )
