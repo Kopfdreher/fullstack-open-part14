@@ -14,22 +14,36 @@ const Blogs = async ({
     ? allBlogs.filter(b => b.title.toLowerCase().includes(filter.toLowerCase()))
     : allBlogs
   return (
-    <div>
-      <h2>Blogs</h2>
-      <div>
-        <form method="GET" action="/blogs">
-          <input type="text" name="filter" defaultValue={filter ?? ''} />
-          <button type="submit">
+    <div className="max-w-2xl mx-auto p-6">
+      <h2 className="text-2xl font-bold mb-4">Blogs</h2>
+      <div className="mb-4">
+        <form method="GET" action="/blogs" className="flex gap-2">
+          <input
+            type="text"
+            name="filter"
+            defaultValue={filter ?? ""}
+            className="border rounded px-3 py-1 flex-1"
+          />
+          <button
+            type="submit"
+            className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
+          >
             search
           </button>
         </form>
       </div>
-      <ul>
+      <ul className="space-y-2">
         {[...blogs]
           .sort((a, b) => b.likes - a.likes)
-          .map(b => (
-            <li key={b.id}>
-              <Link href={`/blogs/${b.id}`}>{b.title}</Link> by {b.author} | {b.likes} likes
+          .map((b) => (
+            <li key={b.id} className="border rounded p-3 hover:bg-gray-50">
+              <Link
+                href={`/blogs/${b.id}`}
+                className="text-blue-600 hover:underline"
+              >
+                {b.title}
+              </Link>{" "}
+              by {b.author} | {b.likes} likes
             </li>
           ))}
       </ul>
