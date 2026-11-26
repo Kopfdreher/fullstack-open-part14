@@ -28,10 +28,10 @@ const Blogs = async ({
         {[...blogs]
           .sort((a, b) => b.likes - a.likes)
           .map(b => (
-          <li key={b.id}>
-            <Link href={`/blogs/${b.id}`}>{b.title}</Link> by {b.author} | {b.likes} likes
-          </li>
-        ))}
+            <li key={b.id}>
+              <Link href={`/blogs/${b.id}`}>{b.title}</Link> by {b.author} | {b.likes} likes
+            </li>
+          ))}
       </ul>
     </div>
   )

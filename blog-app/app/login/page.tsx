@@ -39,7 +39,7 @@ export default function LoginPage() {
         </div>
         <div>
           <label>
-            Passwoard
+            Password
             <input type="password" name="password" required />
           </label>
         </div>
