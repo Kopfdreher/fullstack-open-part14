@@ -4,6 +4,10 @@ import { redirect } from "next/navigation"
 import { addBlog, addLike } from "../services/blogs"
 import { revalidatePath } from "next/cache"
 import { auth } from "@/auth"
+import { and, eq } from "drizzle-orm"
+import { db } from "@/db"
+import { readingList } from "@/db/schema"
+import { getCurrentUser } from "../services/session"
 
 interface input {
     title: string
@@ -47,4 +51,37 @@ export const addBlogLike = async (formData: FormData) => {
   await addLike(id)
   revalidatePath(`/blogs/${id}`)
   revalidatePath("/blogs")
+}
+
+export const addToReadingList = async (formData: FormData) => {
+  const user = await getCurrentUser()
+  if (!user) redirect("/login")
+
+  const blogId = Number(formData.get("blogId"))
+  const existing = await db.query.readingList.findFirst({
+    where: and(eq(readingList.userId, user.id), eq(readingList.blogId, blogId)),
+  })
+
+  if (!existing) {
+    await db.insert(readingList).values({
+      userId: user.id,
+      blogId,
+    })
+  }
+
+  revalidatePath(`/blogs/${blogId}`)
+  revalidatePath("/me")
+}
+
+export const markAsRead = async (formData: FormData) => {
+  const user = await getCurrentUser()
+  if (!user) redirect("/login")
+
+  const id = Number(formData.get("id"))
+  await db
+    .update(readingList)
+    .set({ read: true })
+    .where(and(eq(readingList.id, id), eq(readingList.userId, user.id)))
+
+  revalidatePath("/me")
 }

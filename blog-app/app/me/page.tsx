@@ -1,10 +1,12 @@
 import { Suspense } from "react"
+import Link from "next/link"
 import { redirect } from "next/navigation"
 import { revalidatePath } from "next/cache"
 import { eq } from "drizzle-orm"
 import { auth } from "@/auth"
 import { db } from "@/db"
-import { users } from "@/db/schema"
+import { readingList, users } from "@/db/schema"
+import { markAsRead } from "@/app/actions/blogs"
 
 async function MeContent() {
   const session = await auth()
@@ -20,6 +22,16 @@ async function MeContent() {
   if (!user) {
     redirect("/login")
   }
+
+  const items = await db.query.readingList.findMany({
+    where: eq(readingList.userId, user.id),
+    with: {
+      blog: true,
+    },
+  })
+
+  const unreadItems = items.filter((item) => !item.read)
+  const readItems = items.filter((item) => item.read)
 
   async function generateToken() {
     "use server"
@@ -70,6 +82,62 @@ async function MeContent() {
             Generate new token
           </button>
         </form>
+      </section>
+
+      <section className="space-y-4">
+        <h2 className="text-lg font-semibold">Reading List</h2>
+
+        <div className="space-y-2">
+          <h3 className="font-semibold text-gray-700 dark:text-gray-300">Unread</h3>
+          {unreadItems.length === 0 ? (
+            <p className="text-sm text-gray-500">No unread blogs.</p>
+          ) : (
+            <ul className="space-y-2">
+              {unreadItems.map((item) => (
+                <li
+                  key={item.id}
+                  className="border rounded p-3 flex items-center justify-between gap-2"
+                >
+                  <Link
+                    href={`/blogs/${item.blog.id}`}
+                    className="hover:underline"
+                  >
+                    {item.blog.title} by {item.blog.author}
+                  </Link>
+                  <form action={markAsRead}>
+                    <input type="hidden" name="id" value={item.id} />
+                    <button
+                      type="submit"
+                      className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 cursor-pointer shrink-0"
+                    >
+                      mark as read
+                    </button>
+                  </form>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
+
+        <div className="space-y-2">
+          <h3 className="font-semibold text-gray-700 dark:text-gray-300">Read</h3>
+          {readItems.length === 0 ? (
+            <p className="text-sm text-gray-500">No read blogs.</p>
+          ) : (
+            <ul className="space-y-2">
+              {readItems.map((item) => (
+                <li key={item.id} className="border rounded p-3">
+                  <Link
+                    href={`/blogs/${item.blog.id}`}
+                    className="hover:underline"
+                  >
+                    {item.blog.title} by {item.blog.author}
+                  </Link>
+                </li>
+              ))}
+            </ul>
+          )}
+        </div>
       </section>
     </main>
   )
