@@ -46,9 +46,9 @@ const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
       : false
 
   return (
-    <div className="max-w-2xl mx-auto p-6 space-y-4">
+    <div data-testid="blog-detail" className="max-w-2xl mx-auto p-6 space-y-4">
       <h2 className="text-2xl font-bold">
-        {blog.title} <span className="font-normal text-gray-600">by {blog.author}</span>
+        <span data-testid="blog-title">{blog.title}</span> <span data-testid="blog-author" className="font-normal text-gray-600">by {blog.author}</span>
       </h2>
       <div className="border rounded p-4 flex items-center justify-between">
         <p className="text-lg">likes: {blog.likes}</p>
@@ -67,6 +67,7 @@ const BlogPage = async ({ params }: { params: Promise<{ id: string }> }) => {
               <input type="hidden" name="blogId" value={blog.id} />
               <button
                 type="submit"
+                data-testid="add-to-reading-list-button"
                 className="bg-green-600 text-white px-4 py-1.5 rounded hover:bg-green-700 cursor-pointer"
               >
                 add to reading list

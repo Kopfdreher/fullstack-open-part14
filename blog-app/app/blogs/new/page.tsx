@@ -1,11 +1,22 @@
 "use client"
 
-import { useActionState } from "react"
+import { useActionState, useEffect } from "react"
+import { useRouter } from "next/navigation"
 import { createBlog, type CreateBlogState } from "../../actions/blogs"
+import { useNotification } from "../../components/NotificationContext"
 
 const NewBlog = () => {
   const initialState: CreateBlogState = {}
   const [state, formAction] = useActionState(createBlog, initialState)
+  const router = useRouter()
+  const { showNotification } = useNotification()
+
+  useEffect(() => {
+    if (state.success) {
+      showNotification("Blog created")
+      router.push("/blogs")
+    }
+  }, [state.success, router, showNotification])
 
   return (
     <div className="max-w-2xl mx-auto p-6">
@@ -58,6 +69,7 @@ const NewBlog = () => {
         </div>
         <button
           type="submit"
+          data-testid="create-blog-button"
           className="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700"
         >
           Create

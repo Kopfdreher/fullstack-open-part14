@@ -18,6 +18,7 @@ interface input {
 export interface CreateBlogState {
   errors?: Partial<input>
   values?: input
+  success?: boolean
 }
 
 export const createBlog = async (
@@ -43,7 +44,7 @@ export const createBlog = async (
   await addBlog(title, author, url)
 
   revalidatePath("/blogs")
-  redirect("/blogs")
+  return { success: true }
 }
 
 export const addBlogLike = async (formData: FormData) => {

@@ -21,18 +21,20 @@ const Blogs = async ({
           <input
             type="text"
             name="filter"
+            data-testid="filter-input"
             defaultValue={filter ?? ""}
             className="border rounded px-3 py-1 flex-1"
           />
           <button
             type="submit"
+            data-testid="search-button"
             className="bg-blue-600 text-white px-4 py-1 rounded hover:bg-blue-700"
           >
             search
           </button>
         </form>
       </div>
-      <ul className="space-y-2">
+      <ul data-testid="blogs-list" className="space-y-2">
         {[...blogs]
           .sort((a, b) => b.likes - a.likes)
           .map((b) => (

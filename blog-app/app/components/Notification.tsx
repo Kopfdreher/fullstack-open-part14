@@ -10,7 +10,7 @@ export default function Notification() {
   const bgClass = type === "success" ? "bg-green-600" : "bg-red-600"
 
   return (
-    <div className={`${bgClass} text-white px-4 py-2.5 mb-2.5 rounded`}>
+    <div data-testid="notification" className={`${bgClass} text-white px-4 py-2.5 mb-2.5 rounded`}>
       {message}
     </div>
   )

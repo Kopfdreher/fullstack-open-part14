@@ -1,82 +1,104 @@
-import { Suspense } from "react"
+"use client"
+
+import { useEffect, useState, useCallback } from "react"
 import Link from "next/link"
-import { redirect } from "next/navigation"
-import { revalidatePath } from "next/cache"
-import { eq } from "drizzle-orm"
-import { auth } from "@/auth"
-import { db } from "@/db"
-import { readingList, users } from "@/db/schema"
+import { useRouter } from "next/navigation"
 import { markAsRead } from "@/app/actions/blogs"
 
-async function MeContent() {
-  const session = await auth()
+interface UserProfile {
+  name: string
+  username: string
+  token: string | null
+}
 
-  if (!session?.user?.email) {
-    redirect("/login")
+interface ReadingListItem {
+  id: number
+  read: boolean
+  blog: {
+    id: number
+    title: string
+    author: string
+  }
+}
+
+export default function MePage() {
+  const router = useRouter()
+  const [user, setUser] = useState<UserProfile | null>(null)
+  const [items, setItems] = useState<ReadingListItem[]>([])
+  const [loading, setLoading] = useState(true)
+
+  const fetchProfile = useCallback(async () => {
+    const res = await fetch("/api/me/profile", { cache: "no-store" })
+    if (res.status === 401) {
+      router.replace("/login")
+      return
+    }
+    if (res.ok) {
+      const data = await res.json()
+      setUser(data.user)
+      setItems(data.items)
+    }
+    setLoading(false)
+  }, [router])
+
+  useEffect(() => {
+    fetchProfile()
+  }, [fetchProfile])
+
+  async function handleGenerateToken(e: React.FormEvent) {
+    e.preventDefault()
+    const res = await fetch("/api/me/profile", { method: "POST" })
+    if (res.status === 401) {
+      router.replace("/login")
+      return
+    }
+    if (res.ok) {
+      const data = await res.json()
+      setUser((prev) => (prev ? { ...prev, token: data.token } : prev))
+    }
   }
 
-  const user = await db.query.users.findFirst({
-    where: eq(users.username, session.user.email),
-  })
-
-  if (!user) {
-    redirect("/login")
+  async function handleMarkAsRead(formData: FormData) {
+    await markAsRead(formData)
+    await fetchProfile()
   }
 
-  const items = await db.query.readingList.findMany({
-    where: eq(readingList.userId, user.id),
-    with: {
-      blog: true,
-    },
-  })
+  if (loading || !user) {
+    return <div className="max-w-xl mx-auto p-6">Loading...</div>
+  }
 
   const unreadItems = items.filter((item) => !item.read)
   const readItems = items.filter((item) => item.read)
-
-  async function generateToken() {
-    "use server"
-    const currentSession = await auth()
-    if (!currentSession?.user?.email) {
-      redirect("/login")
-    }
-
-    const token = crypto.randomUUID()
-    await db
-      .update(users)
-      .set({ token })
-      .where(eq(users.username, currentSession.user.email))
-
-    revalidatePath("/me")
-  }
 
   return (
     <main className="max-w-xl mx-auto p-6 space-y-6">
       <h1 className="text-2xl font-bold">My Page</h1>
 
-      <section className="space-y-1">
-        <p>
+      <section data-testid="user-profile" className="space-y-1">
+        <p data-testid="user-name">
           <span className="font-semibold">Name:</span> {user.name}
         </p>
-        <p>
+        <p data-testid="user-username">
           <span className="font-semibold">Username:</span> {user.username}
         </p>
       </section>
 
-      <section className="space-y-3">
+      <section data-testid="api-token-section" className="space-y-3">
         <h2 className="text-lg font-semibold">API Token</h2>
         {user.token ? (
-          <p className="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded break-all">
-            {user.token}
+          <p data-testid="token-display" className="font-mono text-sm bg-gray-100 dark:bg-gray-800 p-2 rounded break-all">
+            <span data-testid="api-token">{user.token}</span>
           </p>
         ) : (
-          <p className="text-gray-600 dark:text-gray-400">
+          <p data-testid="no-token-message" className="text-gray-600 dark:text-gray-400">
             No token has been generated yet.
           </p>
         )}
 
-        <form action={generateToken}>
+        <form onSubmit={handleGenerateToken}>
           <button
             type="submit"
+            data-testid="generate-token-button"
             className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 cursor-pointer"
           >
             Generate new token
@@ -84,13 +106,13 @@ async function MeContent() {
         </form>
       </section>
 
-      <section className="space-y-4">
+      <section data-testid="reading-list-section" className="space-y-4">
         <h2 className="text-lg font-semibold">Reading List</h2>
 
-        <div className="space-y-2">
+        <div data-testid="unread-section" className="space-y-2">
           <h3 className="font-semibold text-gray-700 dark:text-gray-300">Unread</h3>
           {unreadItems.length === 0 ? (
-            <p className="text-sm text-gray-500">No unread blogs.</p>
+            <p data-testid={readItems.length === 0 ? "empty-reading-list" : "no-unread-blogs"} className="text-sm text-gray-500">No unread blogs.</p>
           ) : (
             <ul className="space-y-2">
               {unreadItems.map((item) => (
@@ -104,10 +126,11 @@ async function MeContent() {
                   >
                     {item.blog.title} by {item.blog.author}
                   </Link>
-                  <form action={markAsRead}>
+                  <form action={handleMarkAsRead}>
                     <input type="hidden" name="id" value={item.id} />
                     <button
                       type="submit"
+                      data-testid={`mark-read-${item.id}`}
                       className="px-3 py-1 bg-green-600 text-white text-sm rounded hover:bg-green-700 cursor-pointer shrink-0"
                     >
                       mark as read
@@ -119,7 +142,7 @@ async function MeContent() {
           )}
         </div>
 
-        <div className="space-y-2">
+        <div data-testid="read-section" className="space-y-2">
           <h3 className="font-semibold text-gray-700 dark:text-gray-300">Read</h3>
           {readItems.length === 0 ? (
             <p className="text-sm text-gray-500">No read blogs.</p>
@@ -140,13 +163,5 @@ async function MeContent() {
         </div>
       </section>
     </main>
-  )
-}
-
-export default function MePage() {
-  return (
-    <Suspense fallback={<div className="max-w-xl mx-auto p-6">Loading...</div>}>
-      <MeContent />
-    </Suspense>
   )
 }

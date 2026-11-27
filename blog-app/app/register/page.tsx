@@ -20,7 +20,7 @@ export default function RegisterPage() {
               defaultValue={state.values?.username}
               required />
             {state.errors?.username &&
-              <p style={{ color: "red" }}>{state.errors.username}</p>}
+              <p data-testid="username-error" style={{ color: "red" }}>{state.errors.username}</p>}
           </label>
         </div>
         <div>
@@ -49,17 +49,17 @@ export default function RegisterPage() {
         </div>
         <div>
           <label>
-          Repeat password
+          Confirm Password
             <input
               type="password"
               name="passwordConfirm"
               defaultValue={state.values?.passwordConfirm}
               required />
             {state.errors?.passwordConfirm &&
-              <p style={{ color: "red" }}>{state.errors.passwordConfirm}</p>}
+              <p data-testid="passwordConfirm-error" style={{ color: "red" }}>{state.errors.passwordConfirm}</p>}
           </label>
         </div>
-        <button type="submit">Register</button>
+        <button type="submit" data-testid="register-button">Register</button>
       </form>
     </div>
   )
