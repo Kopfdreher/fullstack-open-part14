@@ -3,13 +3,20 @@ name: End-to-End Tests
 on:
   push:
     branches: [ main, master ]
+    paths:
+      - 'blog-app/**'
   pull_request:
     branches: [ main, master ]
+    paths:
+      - 'blog-app/**'
 
 jobs:
   test:
     timeout-minutes: 60
     runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: blog-app
 
     steps:
       - uses: actions/checkout@v4
@@ -57,5 +64,5 @@ jobs:
         if: ${{ !cancelled() }}
         with:
           name: playwright-report
-          path: playwright-report/
+          path: blog-app/playwright-report/
           retention-days: 30
